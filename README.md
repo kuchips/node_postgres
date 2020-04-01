@@ -71,6 +71,9 @@ curl --request GET 'http://localhost:5000/posts?post_id=1'
 #To get posts of a specific customer
 curl --request GET 'http://localhost:5000/posts?customer_id=12345'
 
+#To get posts of a specific customer order by time DESC
+curl --request GET 'http://localhost:5000/posts?customer_id=12345&orderby=DESC'
+
 #To search for a reference of a word('Hi') in all posts
 curl --request GET 'http://localhost:5000/posts?search=Hi'
 
