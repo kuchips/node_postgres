@@ -1,0 +1,7 @@
+{
+  "customer_id":"12345", 
+  "post_msg":"Hello Sanjay", 
+  "post_status":"A", 
+  "post_type":"post",
+  "media_url":"www.google.com"
+}
