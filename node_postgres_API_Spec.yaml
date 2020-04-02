@@ -1,0 +1,219 @@
+openapi: 3.0.0
+info:
+  description: |
+    This is a data-driven API written in Node.js to connect to a Postgres database using ORM implementation, built on express, dotenv, sequelize & winston packages. This API performs basic CRUD operations on a postgres database.  You can find out more info about this API at
+    [https://github.com/kuchips/node_postgres](https://github.com/kuchips/node_postgres).
+  version: "1.0.0"
+  title: Basic CRUD API - NodeJs & Postgres
+  termsOfService: ''
+  contact:
+    email: kuchips@gmail.com
+  license:
+    name: ISC
+    url: 'https://opensource.org/licenses/ISC'
+servers:
+# Deploy on local
+  - description: Deploy on local machine
+    url: http://localhost:5000
+tags:
+  - name: posts
+    description: Interact with the postgres database
+    externalDocs:
+      description: Find out more
+      url: 'https://github.com/kuchips/node_postgres'
+paths:
+  /posts:
+    #To fetch the posts from the posts table. By default, it fetches the first 100 posts but the result can be controlled using the offset & limit query parameters
+    get:
+      tags:
+        - posts
+      summary: Finds all Posts
+      description: By default, it fetches the first 100 posts
+      operationId: getPosts
+      parameters:
+        - name: offset
+          in: query
+          description: Offset the rows before start fetching the posts
+          required: false
+          schema:
+            type: integer
+            format: int64
+        - name: limit
+          in: query
+          description: Limit the number of posts to be fetched
+          required: false
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Posts'
+      security:
+        - api_key: []
+        
+    #To add a new Post 
+    post:
+      tags:
+        - posts
+      summary: Add a new post to the posts database
+      operationId: makePost
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponse'
+        '400':
+          description: Bad request. No POST body OR Bad request. POST body must be valid JSON.
+        '409':
+          description: Invalid property error.
+      security:
+        - api_key: []
+      requestBody:
+        $ref: '#/components/requestBodies/Post'
+        
+    #To update an existing Post
+    patch:
+      tags:
+        - posts
+      summary: Update an existing post
+      operationId: patchPost
+      parameters:
+        - name: post-id
+          in: query
+          description: post-id to be updated
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful response
+        '400':
+          description: Bad request. No POST body OR Bad request. POST body must be valid JSON.
+      security:
+        - api_key: []
+      requestBody:
+        $ref: '#/components/requestBodies/PatchPost'
+  
+    #To delete an existing Post
+    delete:
+      tags:
+        - posts
+      summary: Deletes a post
+      operationId: deletePost
+      parameters:
+        - name: post-id
+          in: query
+          description: Post id to be deleted
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful response
+        '400':
+          description: post_id is required
+        '404':
+          description: post_id not found
+      security:
+        - api_key: []
+ 
+externalDocs:
+  description: Find out more about this API
+  url: 'https://github.com/kuchips/node_postgres'
+components:
+  schemas:
+    Posts:
+      type: object
+      properties:
+        post_id:
+          type: integer
+          format: int64
+          description: Id of the published post
+        customer_id:
+          type: integer
+          format: int64
+          description: Id of the user publishing the post
+        post_msg:
+          type: string
+          description: Content of the post or comment
+        post_status:
+          type: string
+          description: Status of Post - A(Active) or I(Inactive)
+        post_type:
+          type: string
+          description: Type of Post - post or comment
+        media_url:
+          type: string
+          description: url of an image (if any)
+        added_ts:
+          type: string
+          format: date-time
+          description: Date & Time of the published post
+    PostBody:
+      type: object
+      properties:
+        customer_id:
+          type: integer
+          format: int64
+          description: Id of the user publishing the post
+        post_msg:
+          type: string
+          description: Content of the post or comment
+        post_status:
+          type: string
+          description: Status of Post - A(Active) or I(Inactive)
+        post_type:
+          type: string
+          description: Type of Post - post or comment
+        media_url:
+          type: string
+          description: url of an image (if any)
+    PostResponse:
+      type: object
+      properties:
+        success:
+          type: string
+          description: Success message
+        post:
+          $ref: '#/components/schemas/Posts'
+    PatchPostBody:
+      type: object
+      properties:
+        post_status:
+          type: string
+          description: Status of Post - A(Active) or I(Inactive)
+        post_type:
+          type: string
+          description: Type of Post - post or comment
+          
+  requestBodies:
+    Post:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PostBody'
+      description: Post object that needs to be added to the database
+      required: true
+    PatchPost:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PatchPostBody'
+      description: Post object that needs to be updated in the database
+      required: true
+
+  securitySchemes:
+    api_key:
+      type: apiKey
+      name: api_key
+      in: header
