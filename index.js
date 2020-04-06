@@ -3,8 +3,8 @@ require('dotenv').config()
 
 // Import System packages
 const express = require('express')
-const bodyParser = require('body-parser')
 const cors = require('cors')
+const passport = require('passport')
 
 // Import internal modules
 const logger = require('./config/logger')
@@ -13,21 +13,48 @@ const adaptRequest = require('./helpers/adapt-request')
 
 // Instantiate express module for https requests
 const app = express()
-app.use(cors())
-app.use(bodyParser.json())
+// Use native express body parser instead of bodyParser library
+app.use(express.json())
+// Pass the global object into the passport configuration function
+require('./config/passport')(passport);
 
-// Pass the basic CRUD routes to controller
-app.get('/posts', postsController)
-app.post('/posts', postsController)
-app.patch('/posts', postsController)
-app.delete('/posts', postsController)
+// Initialize the passport object
+app.use(passport.initialize())
 
 // Declare variables
-const port = process.env.EXPRESS_PORT || 5000
+const port = process.env.POSTS_APP_PORT || 5000
 
+// Get JWT Token ** Only for testing purposes **
+app.get('/getToken', (req,res) => {
+  const acquireToken = require('./generateJWT')
+  res.status(200).json({jwt:acquireToken.getToken()})
+})
+
+// Pass the basic CRUD routes to controller
+app.get('/posts', handleAuthentication, postsController)
+app.post('/posts', handleAuthentication, postsController)
+app.patch('/posts', handleAuthentication, postsController)
+app.delete('/posts', handleAuthentication, postsController)
+
+// Controller to handle JWT authentication 
+function handleAuthentication(req,res,next) {
+  passport.authenticate('jwt',{session : false}, function(err,user,info) {
+    // Generate a JSON response if an exception occurs
+    if (err) {
+      return res.send({ success : false, message : `${err}` })
+    }
+    // Generate a JSON response reflecting authentication status
+    if (info) {
+      return res.send({ success : false, message : `${info}` })
+    }
+    return next()
+  })(req, res, next)
+}
+
+// Controller to handle the http requests
 function postsController (req, res) {
-  const httpRequest = adaptRequest(req)
 
+  const httpRequest = adaptRequest(req)
   handlePostsRequest(httpRequest)
     .then(({ headers, statusCode, data }) =>
       res
@@ -36,6 +63,7 @@ function postsController (req, res) {
         .send(data)
     )
     .catch(e => res.status(500).end())
+
 }
 
 // Listen requests on port
