@@ -38,10 +38,13 @@ INSERT INTO posts(customer_id,post_msg,post_status,post_type,media_url,added_as)
 3. Run 'npm install' in the root folder. This will install the following packages from npm.
 
 ```
-"body-parser": "1.19.0",
 "cors": "2.8.4",
+"crypto": "^1.0.1",
 "dotenv": "8.2.0",
 "express": "4.16.3",
+"jsonwebtoken": "^8.5.1",
+"passport": "^0.4.1",
+"passport-jwt": "^4.0.0",
 "pg": "7.18.2",
 "sequelize": "5.21.5",
 "winston": "^3.2.1"

@@ -22,7 +22,7 @@ require('./config/passport')(passport);
 app.use(passport.initialize())
 
 // Declare variables
-const port = process.env.POSTS_APP_PORT || 5000
+const port = process.env.EXPRESS_PORT || 5000
 
 // Get JWT Token ** Only for testing purposes **
 app.get('/getToken', (req,res) => {
@@ -71,5 +71,5 @@ app.listen(port, () => {
   console.log(`posts service listening on port ${port}....`)
 })
   .on('error', () => {
-    logger.log('error', `error listening posts service on port ${port}`)
+    logger.log('error', `Application ${process.env.APP} - error listening on port ${port}`)
   })
