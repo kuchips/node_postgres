@@ -50,21 +50,21 @@ INSERT INTO posts(customer_id,post_msg,post_status,post_type,media_url,added_as)
 "winston": "^3.2.1"
 ```
 
-## Start the express server
-
-Run the following command to start the Express server that listens on port 5000 to interact with the postgres database:
-
-```
-npm start
-
-```
-
 ## Generate the JWT keypair
 
 Run the following command in the root directory of this repo to generate a RSA key pair that can be leveraged for the JWT signature and verification during the http request. The following command generates and saves the public & private key files in the root directory. Please make sure you have atleast Nodev10 on your machine.
 
 ```
 node generateKeyPair
+
+```
+
+## Start the express server
+
+Run the following command to start the Express server that listens on port 5000 to interact with the postgres database:
+
+```
+npm start
 
 ```
 
